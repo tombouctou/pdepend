@@ -57,7 +57,7 @@ use PDepend\Util\Cache\Driver\File\FileCacheDirectory;
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @since     0.10.0
  */
-class FileCacheDriver implements CacheDriver
+class FileCacheDriver implements CacheDriver, \ArrayAccess
 {
     /**
      * Default cache entry type.
@@ -123,6 +123,23 @@ class FileCacheDriver implements CacheDriver
     {
         $this->type = $type;
         return $this;
+    }
+
+    public function offsetExists($offset)
+    {
+        return file_exists($this->getCacheFile($offset));
+    }
+    public function offsetGet($offset)
+    {
+        return $this->restore($offset);
+    }
+    public function offsetSet($offset , $value)
+    {
+        return $this->store($offset, $value);
+    }
+    public function offsetUnset($offset)
+    {
+        return unlink($this->getCacheFile($offset));
     }
 
     /**
